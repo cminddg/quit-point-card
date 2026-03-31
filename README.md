@@ -19,3 +19,10 @@
 npm.cmd install
 npm.cmd run dev
 ```
+
+## GitHub Pages
+
+這個專案已加上 GitHub Actions 自動部署設定，推到 `main` 會自動發布到 GitHub Pages。
+
+- 預期網址：[https://cminddg.github.io/quit-point-card/](https://cminddg.github.io/quit-point-card/)
+- 工作流程檔案：`.github/workflows/deploy-pages.yml`
