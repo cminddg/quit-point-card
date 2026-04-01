@@ -1,7 +1,10 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/recordHelpers";
 
-const MAX_STAMPS = 10;
+const MAX_BASE_POINTS = 10;
+const MAX_EXTRA_POINTS = 20;
+const PUNCH_PROGRESS_KEY = "quit-point-card-punch-progress-v1";
 
 const emotionEmojiMap = {
   煩躁: "😤",
@@ -10,6 +13,8 @@ const emotionEmojiMap = {
   麻木: "💀",
   "其實還好": "🙂"
 };
+
+const hardLifeButtons = ["貸款也要讓你離職 !!", "真的離職了吧!!", "賀!離職!!"];
 
 const quickLinks = [
   {
@@ -32,6 +37,45 @@ const quickLinks = [
   }
 ];
 
+function getDefaultProgress() {
+  return {
+    completedCards: [],
+    currentTarget: MAX_BASE_POINTS,
+    hardLifeStep: 0
+  };
+}
+
+function loadPunchProgress() {
+  if (typeof window === "undefined") {
+    return getDefaultProgress();
+  }
+
+  try {
+    const saved = window.localStorage.getItem(PUNCH_PROGRESS_KEY);
+    if (!saved) {
+      return getDefaultProgress();
+    }
+
+    const parsed = JSON.parse(saved);
+    if (
+      !parsed ||
+      !Array.isArray(parsed.completedCards) ||
+      typeof parsed.currentTarget !== "number" ||
+      typeof parsed.hardLifeStep !== "number"
+    ) {
+      return getDefaultProgress();
+    }
+
+    return {
+      completedCards: parsed.completedCards,
+      currentTarget: parsed.currentTarget,
+      hardLifeStep: parsed.hardLifeStep
+    };
+  } catch {
+    return getDefaultProgress();
+  }
+}
+
 function getRecordEmoji(record) {
   if (!record) {
     return "🫠";
@@ -42,20 +86,38 @@ function getRecordEmoji(record) {
 
 export default function HomePage({ records }) {
   const latestRecord = records[0];
-  const stampRemainder = records.length % MAX_STAMPS;
-  const filledCount =
-    records.length === 0 ? 0 : stampRemainder === 0 ? MAX_STAMPS : stampRemainder;
-  const currentCardNumber = Math.floor(records.length / MAX_STAMPS) + 1;
-  const activeRecords = records.slice(0, filledCount);
-  const stampSlots = Array.from({ length: MAX_STAMPS }, (_, index) => {
-    const isFilled = index < filledCount;
+  const [punchProgress, setPunchProgress] = useState(loadPunchProgress);
 
+  useEffect(() => {
+    window.localStorage.setItem(PUNCH_PROGRESS_KEY, JSON.stringify(punchProgress));
+  }, [punchProgress]);
+
+  const consumedPoints = useMemo(
+    () =>
+      punchProgress.completedCards.reduce(
+        (total, card) => total + (typeof card.target === "number" ? card.target : MAX_BASE_POINTS),
+        0
+      ),
+    [punchProgress.completedCards]
+  );
+
+  const currentTarget = Math.max(MAX_BASE_POINTS, Math.min(MAX_EXTRA_POINTS, punchProgress.currentTarget));
+  const rawCurrentPoints = Math.max(0, records.length - consumedPoints);
+  const filledCount = Math.min(rawCurrentPoints, currentTarget);
+  const isCurrentCardFull = rawCurrentPoints >= currentTarget;
+  const isMaxTargetCard = currentTarget === MAX_EXTRA_POINTS;
+
+  const stampSlots = Array.from({ length: currentTarget }, (_, index) => {
+    const isFilled = index < filledCount;
     return {
       index: index + 1,
       isFilled,
-      emoji: isFilled ? getRecordEmoji(activeRecords[index]) : null
+      emoji: isFilled ? getRecordEmoji(records[index]) : null
     };
   });
+
+  const currentCardNumber = punchProgress.completedCards.length + 1;
+  const hardshipButtonLabel = hardLifeButtons[Math.min(2, punchProgress.hardLifeStep)];
 
   const overviewCards = [
     {
@@ -75,43 +137,138 @@ export default function HomePage({ records }) {
     }
   ];
 
+  function completeCurrentCard(stampType) {
+    setPunchProgress((current) => {
+      const nextCompletedCards = [
+        ...current.completedCards,
+        {
+          target: current.currentTarget,
+          stamp: stampType
+        }
+      ];
+
+      return {
+        completedCards: nextCompletedCards,
+        currentTarget: MAX_BASE_POINTS,
+        hardLifeStep: 0
+      };
+    });
+  }
+
+  function handleKeepTrying() {
+    if (!isCurrentCardFull) {
+      return;
+    }
+
+    setPunchProgress((current) => ({
+      ...current,
+      currentTarget: Math.min(MAX_EXTRA_POINTS, current.currentTarget + 5),
+      hardLifeStep: 0
+    }));
+  }
+
+  function handleHardLifeFlow() {
+    if (!isCurrentCardFull || !isMaxTargetCard) {
+      return;
+    }
+
+    setPunchProgress((current) => {
+      if (current.hardLifeStep >= 2) {
+        const nextCompletedCards = [
+          ...current.completedCards,
+          {
+            target: current.currentTarget,
+            stamp: "worker"
+          }
+        ];
+
+        return {
+          completedCards: nextCompletedCards,
+          currentTarget: MAX_BASE_POINTS,
+          hardLifeStep: 0
+        };
+      }
+
+      return {
+        ...current,
+        hardLifeStep: current.hardLifeStep + 1
+      };
+    });
+  }
+
   return (
     <div className="page-stack">
       <section className="page-card punch-card">
         <div className="punch-card-header">
-          <h2>我的療癒離職集點卡</h2>
-          <p className="punch-card-subtitle">
-            每新增一筆破事就蓋一格章，辛苦了，每一筆都算數。
-          </p>
+          <div className="punch-title-group">
+            <h2>我的療癒離職集點卡</h2>
+            <p className="punch-card-subtitle">每新增一筆破事就蓋一格章，辛苦了，每一筆都算數。</p>
+          </div>
           <div className="punch-meta-pill">累積破事總數：{records.length} 筆</div>
         </div>
 
-        <div className="stamp-board">
-          <h3>
-            已集滿 <span>{filledCount}</span> / {MAX_STAMPS} 點
-          </h3>
-          <p>
-            {filledCount === MAX_STAMPS
-              ? "這張卡已集滿，真的很辛苦。"
-              : "再撐一下下，你正在累積自己的離職勇氣。"}
-          </p>
+        <div className="stamp-board-wrap">
+          <div className="stamp-board">
+            <h3>
+              已集滿 <span>{filledCount}</span> / {currentTarget} 點
+            </h3>
+            <p>
+              {isCurrentCardFull
+                ? "滿點了，該做決定了。"
+                : "再撐一下下，你正在累積自己的離職勇氣。"}
+            </p>
 
-          <div className="stamp-grid" aria-label="離職集點格">
-            {stampSlots.map((slot) => (
-              <div
-                key={slot.index}
-                className={slot.isFilled ? "stamp-slot stamp-slot-filled" : "stamp-slot"}
-              >
-                {slot.isFilled ? (
-                  <span className="stamp-emoji" role="img" aria-label="集點章">
-                    {slot.emoji}
-                  </span>
+            <div className="stamp-grid" aria-label="離職集點格">
+              {stampSlots.map((slot) => (
+                <div
+                  key={slot.index}
+                  className={slot.isFilled ? "stamp-slot stamp-slot-filled" : "stamp-slot"}
+                >
+                  {slot.isFilled ? (
+                    <span className="stamp-emoji" role="img" aria-label="集點章">
+                      {slot.emoji}
+                    </span>
+                  ) : (
+                    <span className="stamp-index">{slot.index}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {isCurrentCardFull ? (
+            <div className="stamp-overlay">
+              <div className="overlay-inner">
+                {!isMaxTargetCard ? (
+                  <div className="overlay-buttons">
+                    <button
+                      type="button"
+                      className="overlay-button overlay-button-success"
+                      onClick={() => completeCurrentCard("good")}
+                    >
+                      成功離職
+                    </button>
+                    <button
+                      type="button"
+                      className="overlay-button overlay-button-effort"
+                      onClick={handleKeepTrying}
+                      disabled={currentTarget >= MAX_EXTRA_POINTS}
+                    >
+                      再努力一下
+                    </button>
+                  </div>
                 ) : (
-                  <span className="stamp-index">{slot.index}</span>
+                  <button
+                    type="button"
+                    className="overlay-button overlay-button-hardlife"
+                    onClick={handleHardLifeFlow}
+                  >
+                    {hardshipButtonLabel}
+                  </button>
                 )}
               </div>
-            ))}
-          </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="punch-actions">
@@ -124,6 +281,16 @@ export default function HomePage({ records }) {
         </div>
 
         <p className="punch-card-note">目前是第 {currentCardNumber} 張集點卡。</p>
+
+        {punchProgress.completedCards.length > 0 ? (
+          <div className="stamp-history">
+            {punchProgress.completedCards.map((card, index) => (
+              <span key={`${card.target}-${index}`} className="stamp-history-pill">
+                第 {index + 1} 張：{card.stamp === "good" ? "好寶寶戳章" : "社畜戳章"}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className="overview-grid">
