@@ -1,15 +1,44 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  buildCountList,
-  getEmotionStats,
-  getTagStats,
-  getTopItem
-} from "../utils/recordHelpers";
+import { getTagStats } from "../utils/recordHelpers";
 import { listPublicQuitReports } from "../lib/supabaseRest";
 
-export default function StatsPage({ records, emotionOptions }) {
+const chartColors = [
+  "#eeac45",
+  "#68be9f",
+  "#67acd0",
+  "#cf739b",
+  "#a682cf",
+  "#e28f61",
+  "#59b4b6",
+  "#e2c541",
+  "#b886c9"
+];
+
+function buildConicGradient(items) {
+  const total = items.reduce((sum, item) => sum + item.count, 0);
+  if (total <= 0) {
+    return "conic-gradient(#f3f4f6 0deg 360deg)";
+  }
+
+  let current = 0;
+  const parts = items.map((item, index) => {
+    const percent = (item.count / total) * 100;
+    const start = current;
+    const end = Math.min(100, current + percent);
+    current = end;
+    return `${chartColors[index % chartColors.length]} ${start}% ${end}%`;
+  });
+
+  if (current < 100) {
+    parts.push(`#f3f4f6 ${current}% 100%`);
+  }
+
+  return `conic-gradient(${parts.join(", ")})`;
+}
+
+export default function StatsPage({ records }) {
   const [cloudRecords, setCloudRecords] = useState(null);
-  const [cloudStatus, setCloudStatus] = useState("loading");
+  const [chartType, setChartType] = useState("pie");
 
   useEffect(() => {
     let isActive = true;
@@ -23,20 +52,17 @@ export default function StatsPage({ records, emotionOptions }) {
 
         const parsed = Array.isArray(rows)
           ? rows.map((item) => ({
-            emotion: item.emotion || "",
             tags: Array.isArray(item.tags) ? item.tags : []
           }))
           : [];
 
         setCloudRecords(parsed);
-        setCloudStatus("ready");
       } catch {
         if (!isActive) {
           return;
         }
 
         setCloudRecords(null);
-        setCloudStatus("fallback");
       }
     }
 
@@ -51,95 +77,86 @@ export default function StatsPage({ records, emotionOptions }) {
     () => (cloudRecords !== null ? cloudRecords : records),
     [cloudRecords, records]
   );
-
-  const emotionCounts = getEmotionStats(sourceRecords, emotionOptions);
   const tagCounts = getTagStats(sourceRecords);
-  const topEmotion = getTopItem(buildCountList(sourceRecords.map((record) => record.emotion).filter(Boolean)));
-  const topTag = getTopItem(tagCounts);
-  const maxEmotionCount = Math.max(...emotionCounts.map((item) => item.count), 1);
-  const sourceNote =
-    cloudStatus === "ready"
-      ? "全站匿名統計（Supabase）"
-      : "目前顯示本機統計（雲端尚未啟用）";
-
-  const summaryCards = [
-    {
-      label: "總紀錄數",
-      value: `${sourceRecords.length}`,
-      note: cloudStatus === "ready" ? "全站匿名統計總筆數" : "目前保存在本機的總筆數"
-    },
-    { label: "最常出現情緒", value: topEmotion, note: "依目前所有紀錄自動計算" },
-    { label: "最常見標籤", value: topTag, note: "會把每筆紀錄的標籤一起統計" }
-  ];
+  const totalTagCount = tagCounts.reduce((sum, item) => sum + item.count, 0);
+  const donutBackground = buildConicGradient(tagCounts);
+  const maxCount = Math.max(...tagCounts.map((item) => item.count), 1);
 
   return (
     <div className="page-stack">
-      <section className="page-card">
-        <p className="mini-label">資料來源</p>
-        <h3>{sourceNote}</h3>
-      </section>
-
-      <section className="summary-grid">
-        {summaryCards.map((card) => (
-          <article key={card.label} className="page-card mini-card">
-            <p className="mini-label">{card.label}</p>
-            <h3>{card.value}</h3>
-            <p>{card.note}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="stats-layout">
-        <article className="page-card chart-card">
-          <div className="section-heading compact-heading">
-            <div>
-              <p className="page-kicker">統計圖表頁</p>
-              <h2>各情緒數量</h2>
-            </div>
-            <p className="section-copy">每次新增紀錄後，這裡都會跟著更新。</p>
+      <section className="page-card stats-overview-card">
+        <div className="stats-header">
+          <div>
+            <p className="page-kicker">📊 離職標籤大數據總覽</p>
+            <h2>全站匿名統計</h2>
           </div>
 
-          <div className="bar-chart">
-            {emotionCounts.map((bar) => (
-              <div key={bar.label} className="bar-row">
-                <span>{bar.label}</span>
-                <div className="bar-track">
-                  <div
-                    className="bar-fill"
-                    style={{ width: `${(bar.count / maxEmotionCount) * 100 || 0}%` }}
-                  />
+          <div className="stats-toggle" role="tablist" aria-label="圖表類型切換">
+            <button
+              type="button"
+              className={`stats-toggle-button ${chartType === "pie" ? "stats-toggle-button-active" : ""}`}
+              onClick={() => setChartType("pie")}
+            >
+              圓餅圖
+            </button>
+            <button
+              type="button"
+              className={`stats-toggle-button ${chartType === "bar" ? "stats-toggle-button-active" : ""}`}
+              onClick={() => setChartType("bar")}
+            >
+              長條圖
+            </button>
+          </div>
+        </div>
+
+        {tagCounts.length === 0 ? (
+          <div className="empty-state compact-empty-state">
+            <h3>目前還沒有可用統計資料</h3>
+            <p>新增幾筆紀錄後，這裡就會開始顯示全站匿名統計圖。</p>
+          </div>
+        ) : (
+          <div className="stats-chart-body">
+            {chartType === "pie" ? (
+              <div className="donut-layout">
+                <div className="donut-wrap">
+                  <div className="donut-chart" style={{ backgroundImage: donutBackground }} />
                 </div>
-                <strong className="bar-value">{bar.count} 筆</strong>
+                <div className="donut-legend">
+                  {tagCounts.map((item, index) => (
+                    <div key={item.label} className="donut-legend-item">
+                      <span
+                        className="donut-legend-dot"
+                        style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                      />
+                      <span>{item.label}</span>
+                      <strong>{item.count}</strong>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="page-card chart-card">
-          <div className="section-heading compact-heading">
-            <div>
-              <p className="page-kicker">標籤觀察</p>
-              <h2>各標籤數量</h2>
-            </div>
-            <p className="section-copy">這裡會統計每個標籤出現幾次，方便你看出常見原因。</p>
-          </div>
-
-          <div className="insight-list">
-            {tagCounts.length > 0 ? (
-              tagCounts.map((item) => (
-                <div key={item.label} className="insight-row">
-                  <span>{item.label}</span>
-                  <strong>{item.count} 次</strong>
-                </div>
-              ))
             ) : (
-              <div className="empty-state compact-empty-state">
-                <h3>目前還沒有標籤資料</h3>
-                <p>新增紀錄時輸入標籤後，這裡就會出現統計結果。</p>
+              <div className="stats-tag-bars">
+                {tagCounts.map((item, index) => (
+                  <div key={item.label} className="stats-tag-row">
+                    <span>{item.label}</span>
+                    <div className="stats-tag-track">
+                      <div
+                        className="stats-tag-fill"
+                        style={{
+                          width: `${(item.count / maxCount) * 100}%`,
+                          backgroundColor: chartColors[index % chartColors.length]
+                        }}
+                      />
+                    </div>
+                    <strong>{item.count}</strong>
+                  </div>
+                ))}
               </div>
             )}
+
+            <p className="stats-total-note">累積標籤次數：{totalTagCount} 次</p>
           </div>
-        </article>
+        )}
       </section>
     </div>
   );

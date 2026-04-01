@@ -999,6 +999,133 @@ textarea {
   padding: 12px 0;
 }
 
+.stats-overview-card {
+  background: #f6f1e4;
+  border: 1px solid rgba(180, 83, 9, 0.14);
+  box-shadow: none;
+}
+
+.stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stats-header h2 {
+  margin: 0;
+}
+
+.stats-toggle {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(156, 163, 175, 0.45);
+  background: #e5e7eb;
+}
+
+.stats-toggle-button {
+  min-height: 38px;
+  padding: 0 16px;
+  border: none;
+  background: transparent;
+  color: #4b5563;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.stats-toggle-button-active {
+  color: #111827;
+  background: #ffffff;
+}
+
+.stats-chart-body {
+  display: grid;
+  gap: 18px;
+}
+
+.donut-layout {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+
+.donut-wrap {
+  display: grid;
+  place-items: center;
+}
+
+.donut-chart {
+  position: relative;
+  width: min(360px, calc(100vw - 120px));
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  border: 4px solid rgba(255, 255, 255, 0.6);
+}
+
+.donut-chart::after {
+  content: "";
+  position: absolute;
+  inset: 24%;
+  border-radius: 999px;
+  background: #f6f1e4;
+}
+
+.donut-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 14px;
+}
+
+.donut-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.donut-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.stats-tag-bars {
+  display: grid;
+  gap: 14px;
+}
+
+.stats-tag-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 220px) minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-tag-track {
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+}
+
+.stats-tag-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.stats-total-note {
+  text-align: center;
+  font-weight: 700;
+  color: #9a3412 !important;
+}
+
 @media (max-width: 720px) {
   .app-shell {
     width: min(100% - 20px, 1120px);
@@ -1087,5 +1214,15 @@ textarea {
   .delete-toast {
     right: 12px;
     bottom: 12px;
+  }
+
+  .stats-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stats-tag-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }
