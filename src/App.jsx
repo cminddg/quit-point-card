@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import AppShell from "./components/AppShell";
 import { initialRecords, STORAGE_KEY, emotionOptions, tagOptions, extraEmojiOptions } from "./data/initialRecords";
 import HomePage from "./pages/HomePage";
-import AddRecordPage from "./pages/AddRecordPage";
 import RecordsPage from "./pages/RecordsPage";
 import StatsPage from "./pages/StatsPage";
 
@@ -111,11 +110,7 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route
           path="/"
-          element={<HomePage records={records} />}
-        />
-        <Route
-          path="/add"
-          element={<AddRecordPage addRecord={addRecord} emotionOptions={emotionOptions} />}
+          element={<HomePage records={records} addRecord={addRecord} />}
         />
         <Route
           path="/records"

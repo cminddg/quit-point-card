@@ -16,7 +16,12 @@ function createInitialForm() {
   };
 }
 
-export default function AddRecordPage({ addRecord, emotionOptions }) {
+export default function AddRecordPage({
+  addRecord,
+  emotionOptions,
+  inlineMode = false,
+  onRecordAdded
+}) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(createInitialForm);
   const [showExtraEmojiMenu, setShowExtraEmojiMenu] = useState(false);
@@ -78,17 +83,21 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
 
     setFormData(createInitialForm());
     setShowExtraEmojiMenu(false);
-    setMessage("新增成功，正在帶你前往紀錄列表。");
 
+    if (inlineMode) {
+      setMessage("新增成功，已完成蓋章。");
+      onRecordAdded?.();
+      return;
+    }
+
+    setMessage("新增成功，正在帶你前往紀錄列表。");
     window.setTimeout(() => {
       navigate("/records");
     }, 600);
   }
 
-  return (
-    <div className="page-stack">
-      <section className="page-card">
-        <form className="record-form" onSubmit={handleSubmit}>
+  const formContent = (
+    <form className="record-form" onSubmit={handleSubmit}>
           <label className="field-group">
             <span>破事標題</span>
             <input
@@ -194,7 +203,15 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
             </button>
           </div>
         </form>
-      </section>
+  );
+
+  if (inlineMode) {
+    return formContent;
+  }
+
+  return (
+    <div className="page-stack">
+      <section className="page-card">{formContent}</section>
     </div>
   );
 }

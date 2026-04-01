@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/recordHelpers";
+import { emotionOptions } from "../data/initialRecords";
+import AddRecordPage from "./AddRecordPage";
 
 const MAX_BASE_POINTS = 10;
 const MAX_EXTRA_POINTS = 20;
@@ -63,8 +65,9 @@ function getRecordEmoji(record) {
   return emotionEmojiMap[record.emotion] || record.emotion || "🫠";
 }
 
-export default function HomePage({ records }) {
+export default function HomePage({ records, addRecord }) {
   const latestRecord = records[0];
+  const [showInlineAddForm, setShowInlineAddForm] = useState(false);
   const [punchProgress, setPunchProgress] = useState(loadPunchProgress);
 
   useEffect(() => {
@@ -81,17 +84,19 @@ export default function HomePage({ records }) {
   );
 
   const currentTarget = Math.max(MAX_BASE_POINTS, Math.min(MAX_EXTRA_POINTS, punchProgress.currentTarget));
-  const rawCurrentPoints = Math.max(0, records.length - consumedPoints);
+  const recordsInOrder = useMemo(() => [...records].reverse(), [records]);
+  const rawCurrentPoints = Math.max(0, recordsInOrder.length - consumedPoints);
   const filledCount = Math.min(rawCurrentPoints, currentTarget);
   const isCurrentCardFull = rawCurrentPoints >= currentTarget;
   const isMaxTargetCard = currentTarget === MAX_EXTRA_POINTS;
+  const currentCardRecords = recordsInOrder.slice(consumedPoints, consumedPoints + filledCount);
 
   const stampSlots = Array.from({ length: currentTarget }, (_, index) => {
     const isFilled = index < filledCount;
     return {
       index: index + 1,
       isFilled,
-      emoji: isFilled ? getRecordEmoji(records[index]) : null
+      emoji: isFilled ? getRecordEmoji(currentCardRecords[index]) : null
     };
   });
 
@@ -233,9 +238,13 @@ export default function HomePage({ records }) {
         </div>
 
         <div className="punch-actions">
-          <Link className="add-trouble-button" to="/add">
+          <button
+            type="button"
+            className="add-trouble-button"
+            onClick={() => setShowInlineAddForm((isOpen) => !isOpen)}
+          >
             ＋ 新增一筆破事
-          </Link>
+          </button>
           <Link className="secondary-button" to="/records">
             看紀錄列表
           </Link>
@@ -253,6 +262,18 @@ export default function HomePage({ records }) {
           </div>
         ) : null}
       </section>
+
+      {showInlineAddForm ? (
+        <section className="page-card inline-add-card">
+          <h2>新增紀錄</h2>
+          <AddRecordPage
+            addRecord={addRecord}
+            emotionOptions={emotionOptions}
+            inlineMode
+            onRecordAdded={() => setShowInlineAddForm(true)}
+          />
+        </section>
+      ) : null}
 
       <section className="page-card">
         <h2>最近一筆紀錄</h2>
@@ -276,7 +297,7 @@ export default function HomePage({ records }) {
         ) : (
           <div className="empty-state">
             <h3>目前還沒有任何紀錄</h3>
-            <p>你可以先去新增紀錄頁輸入第一筆，之後首頁、列表、統計都會一起更新。</p>
+            <p>你可以先在上方點「新增一筆破事」輸入第一筆，之後首頁、列表、統計都會一起更新。</p>
           </div>
         )}
       </section>

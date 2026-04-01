@@ -2,7 +2,6 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const links = [
   { to: "/", label: "首頁" },
-  { to: "/add", label: "新增紀錄" },
   { to: "/records", label: "紀錄列表" },
   { to: "/stats", label: "統計圖表" }
 ];
