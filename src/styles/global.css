@@ -504,7 +504,7 @@ textarea {
 
 .emoji-option-row {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(9, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -523,21 +523,27 @@ textarea {
   box-shadow: inset 0 0 0 1px rgba(154, 52, 18, 0.28);
 }
 
-.custom-emoji-wrap {
-  display: grid;
-  gap: 8px;
-}
-
-.custom-emoji-label {
-  color: #6b7280;
-  font-size: 0.9rem;
-  font-weight: 700;
+.emoji-option-plus {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #9a3412;
 }
 
 .tag-option-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.emoji-menu {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px dashed rgba(180, 83, 9, 0.24);
+  background: rgba(255, 250, 244, 0.88);
 }
 
 .form-actions {
@@ -860,5 +866,9 @@ textarea {
 
   .emoji-option-row {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .emoji-menu {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

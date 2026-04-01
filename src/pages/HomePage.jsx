@@ -81,7 +81,7 @@ function getRecordEmoji(record) {
     return "🫠";
   }
 
-  return emotionEmojiMap[record.emotion] || "🫠";
+  return emotionEmojiMap[record.emotion] || record.emotion || "🫠";
 }
 
 export default function HomePage({ records }) {

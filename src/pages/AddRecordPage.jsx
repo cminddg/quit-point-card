@@ -1,36 +1,27 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { tagOptions } from "../data/initialRecords";
 
 function getTodayValue() {
   return new Date().toISOString().slice(0, 10);
 }
 
-const presetEmojis = ["😤", "😭", "🤬", "😩", "🥲", "🤡", "😶‍🌫️", "🫠"];
+const extraEmojiOptions = ["😵‍💫", "🙄", "🥴", "🤯", "😮‍💨", "🤢", "🤮", "😬", "👹", "👺"];
 
-const presetTags = [
-  "老闆畫大餅",
-  "同事大雷包",
-  "無效冗長會議",
-  "下班奪命連環 Call",
-  "薪水太委屈",
-  "需求朝令夕改",
-  "替人背黑鍋",
-  "燃燒生命大加班",
-  "心好累辦公室政治"
-];
+function createInitialForm() {
+  return {
+    title: "",
+    date: getTodayValue(),
+    emotion: "",
+    tags: [],
+    description: ""
+  };
+}
 
-const initialForm = {
-  title: "",
-  date: getTodayValue(),
-  emotion: "",
-  tags: [],
-  description: ""
-};
-
-export default function AddRecordPage({ addRecord }) {
+export default function AddRecordPage({ addRecord, emotionOptions }) {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState(initialForm);
-  const [customEmoji, setCustomEmoji] = useState("");
+  const [formData, setFormData] = useState(createInitialForm);
+  const [showExtraEmojiMenu, setShowExtraEmojiMenu] = useState(false);
   const [message, setMessage] = useState("");
 
   function handleChange(event) {
@@ -42,20 +33,15 @@ export default function AddRecordPage({ addRecord }) {
   }
 
   function handleSelectEmoji(emoji) {
-    setCustomEmoji("");
     setFormData((currentForm) => ({
       ...currentForm,
       emotion: emoji
     }));
+    setShowExtraEmojiMenu(false);
   }
 
-  function handleCustomEmojiChange(event) {
-    const value = event.target.value;
-    setCustomEmoji(value);
-    setFormData((currentForm) => ({
-      ...currentForm,
-      emotion: value.trim()
-    }));
+  function toggleEmojiMenu() {
+    setShowExtraEmojiMenu((isOpen) => !isOpen);
   }
 
   function toggleTag(tag) {
@@ -71,8 +57,8 @@ export default function AddRecordPage({ addRecord }) {
   }
 
   function handleReset() {
-    setFormData(initialForm);
-    setCustomEmoji("");
+    setFormData(createInitialForm());
+    setShowExtraEmojiMenu(false);
     setMessage("已清空輸入內容。");
   }
 
@@ -92,8 +78,8 @@ export default function AddRecordPage({ addRecord }) {
       description: formData.description.trim()
     });
 
-    setFormData(initialForm);
-    setCustomEmoji("");
+    setFormData(createInitialForm());
+    setShowExtraEmojiMenu(false);
     setMessage("新增成功，正在帶你前往紀錄列表。");
 
     window.setTimeout(() => {
@@ -124,9 +110,9 @@ export default function AddRecordPage({ addRecord }) {
           </div>
 
           <div className="field-group">
-            <span>主要情緒（單選）</span>
+            <span>主要情緒</span>
             <div className="emoji-option-row">
-              {presetEmojis.map((emoji) => (
+              {emotionOptions.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
@@ -139,22 +125,43 @@ export default function AddRecordPage({ addRecord }) {
                   {emoji}
                 </button>
               ))}
+              <button
+                type="button"
+                className={
+                  showExtraEmojiMenu
+                    ? "emoji-option emoji-option-plus emoji-option-active"
+                    : "emoji-option emoji-option-plus"
+                }
+                onClick={toggleEmojiMenu}
+                aria-label="開啟其他 emoji 選單"
+              >
+                +
+              </button>
             </div>
-            <label className="custom-emoji-wrap">
-              <span className="custom-emoji-label">其他 emoji（可自行輸入）</span>
-              <input
-                type="text"
-                value={customEmoji}
-                onChange={handleCustomEmojiChange}
-                placeholder="例如：😵‍💫"
-              />
-            </label>
+
+            {showExtraEmojiMenu ? (
+              <div className="emoji-menu">
+                {extraEmojiOptions.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className={
+                      formData.emotion === emoji ? "emoji-option emoji-option-active" : "emoji-option"
+                    }
+                    onClick={() => handleSelectEmoji(emoji)}
+                    aria-label={`選擇情緒 ${emoji}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="field-group">
-            <span>標籤（可多選）</span>
+            <span>標籤</span>
             <div className="tag-option-grid">
-              {presetTags.map((tag) => (
+              {tagOptions.map((tag) => (
                 <button
                   key={tag}
                   type="button"

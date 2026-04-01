@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatDate } from "../utils/recordHelpers";
+import { tagOptions } from "../data/initialRecords";
 
 export default function RecordsPage({ records, emotionOptions }) {
   const [selectedEmotion, setSelectedEmotion] = useState("全部");
@@ -11,10 +12,6 @@ export default function RecordsPage({ records, emotionOptions }) {
       ...records.map((record) => record.emotion).filter(Boolean)
     ])
   ];
-
-  const allTags = [...new Set(records.flatMap((record) => record.tags))].sort((a, b) =>
-    a.localeCompare(b, "zh-Hant")
-  );
 
   const filteredRecords = records.filter((record) => {
     const matchesEmotion =
@@ -72,7 +69,7 @@ export default function RecordsPage({ records, emotionOptions }) {
               >
                 全部
               </button>
-              {allTags.map((tag) => (
+              {tagOptions.map((tag) => (
                 <button
                   key={tag}
                   type="button"
