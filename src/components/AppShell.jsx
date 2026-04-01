@@ -20,8 +20,8 @@ export default function AppShell() {
         </div>
 
         <div className="topbar-status">
-          <div className="status-badge">Phase 2 畫面版</div>
-          <p className="topbar-note">目前先完成頁面外觀與切換，下一階段再補上假資料與功能。</p>
+          <div className="status-badge">本機資料模式</div>
+          <p className="topbar-note">你新增的紀錄會儲存在目前這個瀏覽器，重新整理後仍會保留。</p>
         </div>
       </header>
 
@@ -45,7 +45,7 @@ export default function AppShell() {
       </main>
 
       <footer className="footer-note">
-        第一版範圍：新增紀錄、紀錄列表、簡單篩選、基本統計圖表。
+        目前功能：新增紀錄、列表篩選、統計圖表（資料儲存在本機瀏覽器）。
       </footer>
     </div>
   );

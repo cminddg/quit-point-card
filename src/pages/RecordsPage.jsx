@@ -23,7 +23,7 @@ export default function RecordsPage({ records, emotionOptions }) {
         <div className="section-heading">
           <div>
             <p className="page-kicker">紀錄列表頁</p>
-            <h2>現在可以真的看資料，也能做簡單篩選</h2>
+            <h2>紀錄列表與篩選</h2>
           </div>
           <p className="section-copy">
             你可以用上方情緒和標籤按鈕，快速縮小成你想看的那一類紀錄。

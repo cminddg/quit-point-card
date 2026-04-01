@@ -62,10 +62,10 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
         <div className="section-heading">
           <div>
             <p className="page-kicker">新增紀錄頁</p>
-            <h2>現在可以真的新增一筆資料了</h2>
+            <h2>新增一筆離職紀錄</h2>
           </div>
           <p className="section-copy">
-            這一版會直接把資料存在你的瀏覽器裡，所以你重整頁面後，剛剛新增的內容還會在。
+            請輸入標題、情緒與內容；儲存後會立即出現在列表與統計頁。
           </p>
         </div>
 
@@ -135,20 +135,6 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
             </button>
           </div>
         </form>
-      </section>
-
-      <section className="page-card tip-panel">
-        <p className="page-kicker">這頁現在的用途</p>
-        <div className="tip-grid">
-          <article>
-            <h3>你現在看到的是什麼</h3>
-            <p>這不只是表單外觀了，現在真的可以新增紀錄，而且會保存在本機瀏覽器。</p>
-          </article>
-          <article>
-            <h3>下一階段會加什麼</h3>
-            <p>如果之後要升級，下一步通常就是接後端帳號、雲端資料庫，讓不同裝置都能同步。</p>
-          </article>
-        </div>
       </section>
     </div>
   );

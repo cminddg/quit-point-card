@@ -16,7 +16,7 @@ const quickLinks = [
   },
   {
     title: "看基本統計",
-    description: "先留出統計圖表的位置，下一階段再接上假資料。",
+    description: "查看情緒與標籤的統計結果，快速掌握近期狀態。",
     to: "/stats",
     action: "前往統計頁"
   }
@@ -49,7 +49,7 @@ export default function HomePage({ records }) {
           <p className="page-kicker">首頁</p>
           <h2>先把「我到底多常想離職」變成看得見的畫面</h2>
           <p className="hero-text">
-            這一頁現在是專案入口。你可以從這裡快速前往新增紀錄、看清單、看統計，也能先理解這個產品第一版要做什麼。
+            這一頁是專案入口。你可以從這裡快速前往新增紀錄、看清單、看統計，快速掌握最近的離職念頭。
           </p>
           <div className="hero-actions">
             <Link className="primary-button" to="/add">
@@ -62,11 +62,11 @@ export default function HomePage({ records }) {
         </div>
 
         <div className="hero-panel">
-          <p className="panel-label">第一版重點</p>
+          <p className="panel-label">使用重點</p>
           <ul className="bullet-list">
-            <li>資料現在會先存在你的瀏覽器裡</li>
             <li>新增後列表與統計會同步更新</li>
-            <li>重整頁面後紀錄也還會保留</li>
+            <li>可用情緒與標籤做快速篩選</li>
+            <li>重整頁面後紀錄仍會保留</li>
           </ul>
         </div>
       </section>
@@ -121,7 +121,7 @@ export default function HomePage({ records }) {
             <p className="page-kicker">快速入口</p>
             <h2>接下來你最常用到的三個區塊</h2>
           </div>
-          <p className="section-copy">先把主要動線整理清楚，之後加功能時就不會亂掉。</p>
+          <p className="section-copy">用最短路徑進到新增、列表與統計，減少操作步驟。</p>
         </div>
 
         <div className="action-grid">
