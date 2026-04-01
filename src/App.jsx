@@ -5,7 +5,7 @@ import { initialRecords, STORAGE_KEY, emotionOptions, tagOptions, extraEmojiOpti
 import HomePage from "./pages/HomePage";
 import RecordsPage from "./pages/RecordsPage";
 import StatsPage from "./pages/StatsPage";
-import { insertPublicQuitReport } from "./lib/supabaseRest";
+import { deletePublicQuitReport, upsertPublicQuitReport } from "./lib/supabaseRest";
 
 const legacyTagMap = {
   需求變動: "需求朝令夕改",
@@ -78,6 +78,14 @@ export default function App() {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   }, [records]);
 
+  useEffect(() => {
+    records.forEach((record) => {
+      upsertPublicQuitReport(record).catch((error) => {
+        console.warn("supabase initial sync failed", error);
+      });
+    });
+  }, []);
+
   function addRecord(recordInput) {
     const normalizedInput = normalizeRecord(recordInput, 0);
     const newRecord = {
@@ -87,27 +95,44 @@ export default function App() {
 
     setRecords((currentRecords) => [newRecord, ...currentRecords]);
 
-    insertPublicQuitReport(newRecord).catch((error) => {
-      console.warn("supabase insert failed", error);
+    upsertPublicQuitReport(newRecord).catch((error) => {
+      console.warn("supabase upsert failed", error);
     });
   }
 
   function updateRecord(recordId, recordInput) {
+    const normalizedInput = normalizeRecord(recordInput, 0);
+    let updatedRecordForSync = null;
+
     setRecords((currentRecords) =>
-      currentRecords.map((record) =>
-        record.id === recordId
-          ? {
-            ...record,
-            ...normalizeRecord(recordInput, 0),
-            id: record.id
-          }
-          : record
-      )
+      currentRecords.map((record) => {
+        if (record.id !== recordId) {
+          return record;
+        }
+
+        const updatedRecord = {
+          ...record,
+          ...normalizedInput,
+          id: record.id
+        };
+        updatedRecordForSync = updatedRecord;
+        return updatedRecord;
+      })
     );
+
+    if (updatedRecordForSync) {
+      upsertPublicQuitReport(updatedRecordForSync).catch((error) => {
+        console.warn("supabase update sync failed", error);
+      });
+    }
   }
 
   function deleteRecord(recordId) {
     setRecords((currentRecords) => currentRecords.filter((record) => record.id !== recordId));
+
+    deletePublicQuitReport(recordId).catch((error) => {
+      console.warn("supabase delete failed", error);
+    });
   }
 
   return (

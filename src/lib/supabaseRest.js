@@ -17,30 +17,38 @@ function getEndpoint(path) {
   return `${SUPABASE_URL}/rest/v1/${path}`;
 }
 
-export async function insertPublicQuitReport(record) {
-  if (!hasSupabaseConfig()) {
-    return;
-  }
-
-  const payload = {
+function toPayload(record) {
+  return {
+    client_record_id: String(record.id || ""),
     emotion: record.emotion || null,
     tags: Array.isArray(record.tags) ? record.tags : [],
     report_date: record.date || null
   };
+}
 
-  const response = await fetch(getEndpoint(TABLE_NAME), {
+export async function upsertPublicQuitReport(record) {
+  if (!hasSupabaseConfig()) {
+    return;
+  }
+
+  const payload = toPayload(record);
+  if (!payload.client_record_id) {
+    return;
+  }
+
+  const response = await fetch(getEndpoint(`${TABLE_NAME}?on_conflict=client_record_id`), {
     method: "POST",
     headers: {
       ...getBaseHeaders(),
       "Content-Type": "application/json",
-      Prefer: "return=minimal"
+      Prefer: "resolution=merge-duplicates,return=minimal"
     },
     body: JSON.stringify(payload)
   });
 
   if (!response.ok) {
     const message = await response.text();
-    throw new Error(message || "insert failed");
+    throw new Error(message || "upsert failed");
   }
 }
 
@@ -60,4 +68,31 @@ export async function listPublicQuitReports() {
   }
 
   return response.json();
+}
+
+export async function deletePublicQuitReport(recordId) {
+  if (!hasSupabaseConfig()) {
+    return;
+  }
+
+  const safeId = String(recordId || "").trim();
+  if (!safeId) {
+    return;
+  }
+
+  const response = await fetch(
+    getEndpoint(`${TABLE_NAME}?client_record_id=eq.${encodeURIComponent(safeId)}`),
+    {
+      method: "DELETE",
+      headers: {
+        ...getBaseHeaders(),
+        Prefer: "return=minimal"
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "delete failed");
+  }
 }
