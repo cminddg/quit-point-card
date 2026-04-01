@@ -1,6 +1,16 @@
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/recordHelpers";
 
+const MAX_STAMPS = 10;
+
+const emotionEmojiMap = {
+  煩躁: "😤",
+  委屈: "🥺",
+  疲憊: "🥱",
+  麻木: "💀",
+  "其實還好": "🙂"
+};
+
 const quickLinks = [
   {
     title: "新增一筆離職紀錄",
@@ -22,8 +32,31 @@ const quickLinks = [
   }
 ];
 
+function getRecordEmoji(record) {
+  if (!record) {
+    return "🫠";
+  }
+
+  return emotionEmojiMap[record.emotion] || "🫠";
+}
+
 export default function HomePage({ records }) {
   const latestRecord = records[0];
+  const stampRemainder = records.length % MAX_STAMPS;
+  const filledCount =
+    records.length === 0 ? 0 : stampRemainder === 0 ? MAX_STAMPS : stampRemainder;
+  const currentCardNumber = Math.floor(records.length / MAX_STAMPS) + 1;
+  const activeRecords = records.slice(0, filledCount);
+  const stampSlots = Array.from({ length: MAX_STAMPS }, (_, index) => {
+    const isFilled = index < filledCount;
+
+    return {
+      index: index + 1,
+      isFilled,
+      emoji: isFilled ? getRecordEmoji(activeRecords[index]) : null
+    };
+  });
+
   const overviewCards = [
     {
       label: "總紀錄數",
@@ -44,21 +77,53 @@ export default function HomePage({ records }) {
 
   return (
     <div className="page-stack">
-      <section className="page-card hero-card">
-        <div className="hero-copy">
-          <h2>離職心情總覽</h2>
-          <p className="hero-text">
-            這一頁是專案入口。你可以從這裡快速前往新增紀錄、看清單、看統計，快速掌握最近的離職念頭。
+      <section className="page-card punch-card">
+        <div className="punch-card-header">
+          <h2>我的療癒離職集點卡</h2>
+          <p className="punch-card-subtitle">
+            每新增一筆破事就蓋一格章，辛苦了，每一筆都算數。
           </p>
-          <div className="hero-actions">
-            <Link className="primary-button" to="/add">
-              立即記一筆
-            </Link>
-            <Link className="secondary-button" to="/records">
-              看紀錄列表
-            </Link>
+          <div className="punch-meta-pill">累積破事總數：{records.length} 筆</div>
+        </div>
+
+        <div className="stamp-board">
+          <h3>
+            已集滿 <span>{filledCount}</span> / {MAX_STAMPS} 點
+          </h3>
+          <p>
+            {filledCount === MAX_STAMPS
+              ? "這張卡已集滿，真的很辛苦。"
+              : "再撐一下下，你正在累積自己的離職勇氣。"}
+          </p>
+
+          <div className="stamp-grid" aria-label="離職集點格">
+            {stampSlots.map((slot) => (
+              <div
+                key={slot.index}
+                className={slot.isFilled ? "stamp-slot stamp-slot-filled" : "stamp-slot"}
+              >
+                {slot.isFilled ? (
+                  <span className="stamp-emoji" role="img" aria-label="集點章">
+                    {slot.emoji}
+                  </span>
+                ) : (
+                  <span className="stamp-index">{slot.index}</span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
+
+        <div className="punch-actions">
+          <Link className="add-trouble-button" to="/add">
+            ＋ 新增一筆破事
+          </Link>
+          <Link className="secondary-button" to="/records">
+            看紀錄列表
+          </Link>
+        </div>
+
+        <p className="punch-card-note">目前是第 {currentCardNumber} 張集點卡。</p>
       </section>
 
       <section className="overview-grid">
