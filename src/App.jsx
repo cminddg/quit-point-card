@@ -5,6 +5,7 @@ import { initialRecords, STORAGE_KEY, emotionOptions, tagOptions, extraEmojiOpti
 import HomePage from "./pages/HomePage";
 import RecordsPage from "./pages/RecordsPage";
 import StatsPage from "./pages/StatsPage";
+import { insertPublicQuitReport } from "./lib/supabaseRest";
 
 const legacyTagMap = {
   需求變動: "需求朝令夕改",
@@ -85,6 +86,10 @@ export default function App() {
     };
 
     setRecords((currentRecords) => [newRecord, ...currentRecords]);
+
+    insertPublicQuitReport(newRecord).catch((error) => {
+      console.warn("supabase insert failed", error);
+    });
   }
 
   function updateRecord(recordId, recordInput) {

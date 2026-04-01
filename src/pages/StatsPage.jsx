@@ -1,25 +1,84 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   buildCountList,
   getEmotionStats,
   getTagStats,
   getTopItem
 } from "../utils/recordHelpers";
+import { listPublicQuitReports } from "../lib/supabaseRest";
 
 export default function StatsPage({ records, emotionOptions }) {
-  const emotionCounts = getEmotionStats(records, emotionOptions);
-  const tagCounts = getTagStats(records);
-  const topEmotion = getTopItem(buildCountList(records.map((record) => record.emotion)));
+  const [cloudRecords, setCloudRecords] = useState(null);
+  const [cloudStatus, setCloudStatus] = useState("loading");
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadCloudStats() {
+      try {
+        const rows = await listPublicQuitReports();
+        if (!isActive) {
+          return;
+        }
+
+        const parsed = Array.isArray(rows)
+          ? rows.map((item) => ({
+            emotion: item.emotion || "",
+            tags: Array.isArray(item.tags) ? item.tags : []
+          }))
+          : [];
+
+        setCloudRecords(parsed);
+        setCloudStatus("ready");
+      } catch {
+        if (!isActive) {
+          return;
+        }
+
+        setCloudRecords(null);
+        setCloudStatus("fallback");
+      }
+    }
+
+    loadCloudStats();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const sourceRecords = useMemo(
+    () => (cloudRecords !== null ? cloudRecords : records),
+    [cloudRecords, records]
+  );
+
+  const emotionCounts = getEmotionStats(sourceRecords, emotionOptions);
+  const tagCounts = getTagStats(sourceRecords);
+  const topEmotion = getTopItem(buildCountList(sourceRecords.map((record) => record.emotion).filter(Boolean)));
   const topTag = getTopItem(tagCounts);
   const maxEmotionCount = Math.max(...emotionCounts.map((item) => item.count), 1);
+  const sourceNote =
+    cloudStatus === "ready"
+      ? "全站匿名統計（Supabase）"
+      : "目前顯示本機統計（雲端尚未啟用）";
 
   const summaryCards = [
-    { label: "總紀錄數", value: `${records.length}`, note: "目前保存在本機的總筆數" },
+    {
+      label: "總紀錄數",
+      value: `${sourceRecords.length}`,
+      note: cloudStatus === "ready" ? "全站匿名統計總筆數" : "目前保存在本機的總筆數"
+    },
     { label: "最常出現情緒", value: topEmotion, note: "依目前所有紀錄自動計算" },
     { label: "最常見標籤", value: topTag, note: "會把每筆紀錄的標籤一起統計" }
   ];
 
   return (
     <div className="page-stack">
+      <section className="page-card">
+        <p className="mini-label">資料來源</p>
+        <h3>{sourceNote}</h3>
+      </section>
+
       <section className="summary-grid">
         {summaryCards.map((card) => (
           <article key={card.label} className="page-card mini-card">
