@@ -130,28 +130,18 @@ textarea {
   white-space: nowrap;
   color: #1f2937 !important;
   font-weight: 700;
-  animation: marquee-rise 7s ease-in-out both;
+  animation: marquee-rise-in 480ms ease-out both;
 }
 
-@keyframes marquee-rise {
+@keyframes marquee-rise-in {
   0% {
     transform: translateY(110%);
     opacity: 0;
   }
 
-  12% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  78% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
   100% {
-    transform: translateY(-110%);
-    opacity: 0;
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
