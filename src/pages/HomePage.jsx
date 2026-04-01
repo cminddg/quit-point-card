@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { formatDate } from "../utils/recordHelpers";
 import { emotionOptions } from "../data/initialRecords";
 import AddRecordPage from "./AddRecordPage";
+import AnnouncementMarquee from "../components/AnnouncementMarquee";
 
 const MAX_BASE_POINTS = 10;
 const MAX_EXTRA_POINTS = 20;
@@ -164,6 +165,8 @@ export default function HomePage({ records, addRecord }) {
 
   return (
     <div className="page-stack">
+      <AnnouncementMarquee />
+
       <section className="page-card punch-card">
         <div className="punch-card-header">
           <div className="punch-title-group">
