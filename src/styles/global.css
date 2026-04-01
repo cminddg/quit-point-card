@@ -119,35 +119,38 @@ textarea {
 .marquee-viewport {
   position: relative;
   flex: 1;
+  height: 1.6em;
   overflow: hidden;
 }
 
 .marquee-text {
   margin: 0 !important;
   max-width: none !important;
-  display: inline-block;
+  display: block;
   white-space: nowrap;
   color: #1f2937 !important;
   font-weight: 700;
-  animation: marquee-slide 4s linear;
+  animation: marquee-rise 7s ease-in-out both;
 }
 
-@keyframes marquee-slide {
+@keyframes marquee-rise {
   0% {
-    transform: translateX(100%);
+    transform: translateY(110%);
     opacity: 0;
   }
 
-  10% {
+  12% {
     opacity: 1;
+    transform: translateY(0);
   }
 
-  90% {
+  78% {
     opacity: 1;
+    transform: translateY(0);
   }
 
   100% {
-    transform: translateX(-100%);
+    transform: translateY(-110%);
     opacity: 0;
   }
 }

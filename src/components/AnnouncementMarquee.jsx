@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 const SHEET_ID = "1UEx7VQplf_RB3XxHaBAhsdDCswqQ0nsN";
-const ROTATE_INTERVAL_MS = 4000;
+const ROTATE_INTERVAL_MS = 7000;
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 const FALLBACK_MESSAGES = ["公告載入中，請稍候。"];
 
