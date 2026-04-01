@@ -26,3 +26,11 @@ npm.cmd run dev
 
 - 預期網址：[https://cminddg.github.io/quit-point-card/](https://cminddg.github.io/quit-point-card/)
 - 工作流程檔案：`.github/workflows/deploy-pages.yml`
+
+## Axios 防呆
+
+此專案已加入 Axios 防呆機制。
+
+- 在 `npm install`、`npm run dev`、`npm run build`、`npm run preview` 前都會檢查
+- 只要偵測到 Axios，就會直接中止並顯示清楚警告
+- 政策是先全面改用原生 `fetch`

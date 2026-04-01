@@ -4,8 +4,14 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "guard:no-axios": "node ./scripts/guard-no-axios.cjs",
+    "preinstall": "node ./scripts/guard-no-axios.cjs",
+    "postinstall": "node ./scripts/guard-no-axios.cjs",
+    "predev": "node ./scripts/guard-no-axios.cjs",
     "dev": "vite",
+    "prebuild": "node ./scripts/guard-no-axios.cjs",
     "build": "vite build",
+    "prepreview": "node ./scripts/guard-no-axios.cjs",
     "preview": "vite preview"
   },
   "dependencies": {
