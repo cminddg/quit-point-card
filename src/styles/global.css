@@ -50,7 +50,7 @@ textarea {
 .topbar {
   display: flex;
   align-items: stretch;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 24px;
   margin-bottom: 20px;
 }
@@ -75,7 +75,7 @@ textarea {
 }
 
 .topbar-copy {
-  max-width: 620px;
+  max-width: 760px;
 }
 
 .topbar-description {
@@ -83,32 +83,6 @@ textarea {
   max-width: 580px;
   color: #4b5563;
   font-size: 1.02rem;
-}
-
-.topbar-status {
-  display: flex;
-  max-width: 280px;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: #fff1d6;
-  color: #b45309;
-  font-size: 0.88rem;
-  font-weight: 800;
-}
-
-.topbar-note {
-  margin: 0;
-  color: #6b7280;
-  text-align: left;
 }
 
 .nav-tabs {
@@ -654,11 +628,6 @@ textarea {
   .tip-grid,
   .stats-layout {
     grid-template-columns: 1fr;
-  }
-
-  .topbar-note {
-    max-width: none;
-    text-align: left;
   }
 
   .section-copy {

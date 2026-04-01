@@ -18,11 +18,6 @@ export default function AppShell() {
             把每天想離職的瞬間留下來，先用最簡單的方式看見自己的情緒、原因和累積趨勢。
           </p>
         </div>
-
-        <div className="topbar-status">
-          <div className="status-badge">本機資料模式</div>
-          <p className="topbar-note">你新增的紀錄會儲存在目前這個瀏覽器，重新整理後仍會保留。</p>
-        </div>
       </header>
 
       <nav className="nav-tabs" aria-label="主要頁面">
@@ -45,7 +40,7 @@ export default function AppShell() {
       </main>
 
       <footer className="footer-note">
-        目前功能：新增紀錄、列表篩選、統計圖表（資料儲存在本機瀏覽器）。
+        目前功能：新增紀錄、列表篩選、統計圖表。
       </footer>
     </div>
   );
