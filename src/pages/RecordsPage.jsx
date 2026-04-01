@@ -28,7 +28,6 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
     const searchSource = [
       record.title,
       record.description,
-      record.emotion,
       record.date,
       ...(record.tags || [])
     ]
@@ -118,34 +117,26 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
           <div className="record-search-row">
             <label className="field-group record-search-group">
               <span>搜尋</span>
-              <input
-                type="text"
-                value={searchKeyword}
-                onChange={(event) => setSearchKeyword(event.target.value)}
-                placeholder="找尋過往痛苦的記憶？"
-              />
+              <div className="search-input-wrap">
+                <input
+                  type="text"
+                  value={searchKeyword}
+                  onChange={(event) => setSearchKeyword(event.target.value)}
+                  placeholder="找尋過往痛苦的記憶？"
+                />
+                {searchKeyword ? (
+                  <button
+                    type="button"
+                    className="search-clear-button"
+                    onClick={() => setSearchKeyword("")}
+                    aria-label="清除搜尋內容"
+                    title="清除搜尋內容"
+                  >
+                    ×
+                  </button>
+                ) : null}
+              </div>
             </label>
-
-            <div className="view-switch" role="group" aria-label="切換紀錄顯示方式">
-              <button
-                type="button"
-                className={viewMode === "list" ? "view-switch-button view-switch-button-active" : "view-switch-button"}
-                onClick={() => setViewMode("list")}
-                aria-label="切換成橫列形式"
-                title="橫列形式"
-              >
-                ☰
-              </button>
-              <button
-                type="button"
-                className={viewMode === "card" ? "view-switch-button view-switch-button-active" : "view-switch-button"}
-                onClick={() => setViewMode("card")}
-                aria-label="切換成卡片形式"
-                title="卡片形式"
-              >
-                ▦
-              </button>
-            </div>
           </div>
 
           <div className="filter-group">
@@ -186,6 +177,28 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
       <section className="record-list">
         <div className="list-summary">
           <strong>目前顯示 {filteredRecords.length} 筆</strong>
+          <div className="list-summary-actions">
+            <div className="view-switch" role="group" aria-label="切換紀錄顯示方式">
+              <button
+                type="button"
+                className={viewMode === "list" ? "view-switch-button view-switch-button-active" : "view-switch-button"}
+                onClick={() => setViewMode("list")}
+                aria-label="切換成橫列形式"
+                title="橫列形式"
+              >
+                ☰
+              </button>
+              <button
+                type="button"
+                className={viewMode === "card" ? "view-switch-button view-switch-button-active" : "view-switch-button"}
+                onClick={() => setViewMode("card")}
+                aria-label="切換成卡片形式"
+                title="卡片形式"
+              >
+                ▦
+              </button>
+            </div>
+          </div>
         </div>
 
         {filteredRecords.length > 0 ? (
@@ -199,85 +212,51 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
                     : "page-card record-card"
                 }
               >
-              <div className="record-card-top">
-                <div>
-                  <p className="record-date">
-                    {formatDate(record.date)}
-                    {record.emotion ? ` · ${record.emotion}` : ""}
-                  </p>
-                  <h3>{record.title}</h3>
+                <div className="record-card-top">
+                  <div>
+                    <p className="record-date">{formatDate(record.date)}</p>
+                    <h3>{record.title}</h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="record-icon-button"
+                    onClick={() => startEdit(record)}
+                    aria-label="編輯這筆紀錄"
+                  >
+                    ✏️
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className="record-icon-button"
-                  onClick={() => startEdit(record)}
-                  aria-label="編輯這筆紀錄"
-                >
-                  ✏️
-                </button>
-              </div>
 
-              {editingRecordId === record.id ? (
-                <div className="record-edit-shell">
-                  <div className="record-form">
-                    <label className="field-group">
-                      <span>破事標題</span>
-                      <input
-                        type="text"
-                        name="title"
-                        value={editingForm.title}
-                        onChange={handleEditChange}
-                        placeholder="例如：又被臨時改需求，心很累"
-                      />
-                    </label>
-
-                    <div className="form-two-columns">
+                {editingRecordId === record.id ? (
+                  <div className="record-edit-shell">
+                    <div className="record-form">
                       <label className="field-group">
-                        <span>日期</span>
+                        <span>破事標題</span>
                         <input
-                          type="date"
-                          name="date"
-                          value={editingForm.date}
+                          type="text"
+                          name="title"
+                          value={editingForm.title}
                           onChange={handleEditChange}
+                          placeholder="例如：又被臨時改需求，心很累"
                         />
                       </label>
-                    </div>
 
-                    <div className="field-group">
-                      <span>主要情緒</span>
-                      <div className="emoji-option-row">
-                        {emotionOptions.map((emoji) => (
-                          <button
-                            key={emoji}
-                            type="button"
-                            className={
-                              editingForm.emotion === emoji
-                                ? "emoji-option emoji-option-active"
-                                : "emoji-option"
-                            }
-                            onClick={() => handleEditEmojiSelect(emoji)}
-                            aria-label={`選擇情緒 ${emoji}`}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          className={
-                            showExtraEmojiMenu
-                              ? "emoji-option emoji-option-plus emoji-option-active"
-                              : "emoji-option emoji-option-plus"
-                          }
-                          onClick={() => setShowExtraEmojiMenu((isOpen) => !isOpen)}
-                          aria-label="開啟其他 emoji 選單"
-                        >
-                          +
-                        </button>
+                      <div className="form-two-columns">
+                        <label className="field-group">
+                          <span>日期</span>
+                          <input
+                            type="date"
+                            name="date"
+                            value={editingForm.date}
+                            onChange={handleEditChange}
+                          />
+                        </label>
                       </div>
 
-                      {showExtraEmojiMenu ? (
-                        <div className="emoji-menu">
-                          {extraEmojiOptions.map((emoji) => (
+                      <div className="field-group">
+                        <span>主要情緒</span>
+                        <div className="emoji-option-row">
+                          {emotionOptions.map((emoji) => (
                             <button
                               key={emoji}
                               type="button"
@@ -292,68 +271,99 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
                               {emoji}
                             </button>
                           ))}
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div className="field-group">
-                      <span>標籤</span>
-                      <div className="tag-option-grid">
-                        {tagOptions.map((tag) => (
                           <button
-                            key={tag}
                             type="button"
                             className={
-                              editingForm.tags.includes(tag)
-                                ? "chip-button chip-button-active"
-                                : "chip-button"
+                              showExtraEmojiMenu
+                                ? "emoji-option emoji-option-plus emoji-option-active"
+                                : "emoji-option emoji-option-plus"
                             }
-                            onClick={() => handleEditTagToggle(tag)}
+                            onClick={() => setShowExtraEmojiMenu((isOpen) => !isOpen)}
+                            aria-label="開啟其他 emoji 選單"
                           >
-                            {tag}
+                            +
                           </button>
-                        ))}
+                        </div>
+
+                        {showExtraEmojiMenu ? (
+                          <div className="emoji-menu">
+                            {extraEmojiOptions.map((emoji) => (
+                              <button
+                                key={emoji}
+                                type="button"
+                                className={
+                                  editingForm.emotion === emoji
+                                    ? "emoji-option emoji-option-active"
+                                    : "emoji-option"
+                                }
+                                onClick={() => handleEditEmojiSelect(emoji)}
+                                aria-label={`選擇情緒 ${emoji}`}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="field-group">
+                        <span>標籤</span>
+                        <div className="tag-option-grid">
+                          {tagOptions.map((tag) => (
+                            <button
+                              key={tag}
+                              type="button"
+                              className={
+                                editingForm.tags.includes(tag)
+                                  ? "chip-button chip-button-active"
+                                  : "chip-button"
+                              }
+                              onClick={() => handleEditTagToggle(tag)}
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <label className="field-group">
+                        <span>想多說一點的內容</span>
+                        <textarea
+                          name="description"
+                          value={editingForm.description}
+                          onChange={handleEditChange}
+                          rows="6"
+                          placeholder="今天又發生什麼鳥事了？吐吐苦水吧......"
+                        />
+                      </label>
+
+                      <div className="form-actions">
+                        <button type="button" className="primary-button" onClick={() => handleSave(record.id)}>
+                          💾 儲存
+                        </button>
+                        <button type="button" className="danger-button" onClick={() => handleDelete(record.id)}>
+                          🗑️ 刪除
+                        </button>
                       </div>
                     </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="record-description">{record.description}</p>
 
-                    <label className="field-group">
-                      <span>想多說一點的內容</span>
-                      <textarea
-                        name="description"
-                        value={editingForm.description}
-                        onChange={handleEditChange}
-                        rows="6"
-                        placeholder="今天又發生什麼鳥事了？吐吐苦水吧......"
-                      />
-                    </label>
-
-                    <div className="form-actions">
-                      <button type="button" className="primary-button" onClick={() => handleSave(record.id)}>
-                        💾 儲存
-                      </button>
-                      <button type="button" className="danger-button" onClick={() => handleDelete(record.id)}>
-                        🗑️ 刪除
-                      </button>
+                    <div className="tag-row">
+                      {record.tags.length > 0 ? (
+                        record.tags.map((tag) => (
+                          <span key={tag} className="tag-pill">
+                            #{tag}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="tag-pill">#未分類</span>
+                      )}
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <p className="record-description">{record.description}</p>
-
-                  <div className="tag-row">
-                    {record.tags.length > 0 ? (
-                      record.tags.map((tag) => (
-                        <span key={tag} className="tag-pill">
-                          #{tag}
-                        </span>
-                      ))
-                    ) : (
-                    <span className="tag-pill">#未分類</span>
-                  )}
-                  </div>
-                </>
-              )}
+                  </>
+                )}
               </article>
             ))}
           </div>

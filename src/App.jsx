@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import AppShell from "./components/AppShell";
-import { initialRecords, STORAGE_KEY, emotionOptions, tagOptions } from "./data/initialRecords";
+import { initialRecords, STORAGE_KEY, emotionOptions, tagOptions, extraEmojiOptions } from "./data/initialRecords";
 import HomePage from "./pages/HomePage";
 import AddRecordPage from "./pages/AddRecordPage";
 import RecordsPage from "./pages/RecordsPage";
@@ -21,6 +21,7 @@ const legacyTagMap = {
   call: "下班奪命連環 Call",
   "下班 call": "下班奪命連環 Call"
 };
+const validEmotions = new Set([...emotionOptions, ...extraEmojiOptions]);
 
 function normalizeTag(tag) {
   const value = String(tag ?? "").trim().replace(/^#+/, "");
@@ -31,12 +32,13 @@ function normalizeTag(tag) {
 function normalizeRecord(record, index) {
   const rawTags = Array.isArray(record?.tags) ? record.tags : [];
   const normalizedTags = [...new Set(rawTags.map(normalizeTag).filter(Boolean))];
+  const normalizedEmotion = String(record?.emotion || "").trim();
 
   return {
     id: String(record?.id || `legacy-${index}-${Date.now()}`),
     title: String(record?.title || "").trim(),
     date: String(record?.date || "").trim(),
-    emotion: String(record?.emotion || "").trim(),
+    emotion: validEmotions.has(normalizedEmotion) ? normalizedEmotion : "",
     tags: normalizedTags,
     description: String(record?.description || "").trim()
   };
