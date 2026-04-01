@@ -498,8 +498,46 @@ textarea {
 
 .form-two-columns {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 16px;
+}
+
+.emoji-option-row {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.emoji-option {
+  min-height: 50px;
+  border-radius: 14px;
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  background: #fffaf4;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.emoji-option-active {
+  border-color: #9a3412;
+  background: #fff0dd;
+  box-shadow: inset 0 0 0 1px rgba(154, 52, 18, 0.28);
+}
+
+.custom-emoji-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.custom-emoji-label {
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.tag-option-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .form-actions {
@@ -818,5 +856,9 @@ textarea {
 
   .overlay-inner {
     padding: 16px;
+  }
+
+  .emoji-option-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

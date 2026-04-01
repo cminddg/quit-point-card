@@ -5,6 +5,13 @@ export default function RecordsPage({ records, emotionOptions }) {
   const [selectedEmotion, setSelectedEmotion] = useState("全部");
   const [selectedTag, setSelectedTag] = useState("全部");
 
+  const allEmotions = [
+    ...new Set([
+      ...emotionOptions,
+      ...records.map((record) => record.emotion).filter(Boolean)
+    ])
+  ];
+
   const allTags = [...new Set(records.flatMap((record) => record.tags))].sort((a, b) =>
     a.localeCompare(b, "zh-Hant")
   );
@@ -34,7 +41,7 @@ export default function RecordsPage({ records, emotionOptions }) {
           <div className="filter-group">
             <span className="filter-label">情緒</span>
             <div className="chip-row">
-              {["全部", ...emotionOptions].map((emotion) => (
+              {["全部", ...allEmotions].map((emotion) => (
                 <button
                   key={emotion}
                   type="button"

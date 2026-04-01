@@ -40,7 +40,13 @@ export function buildCountList(values) {
 }
 
 export function getEmotionStats(records, emotionOptions) {
-  return emotionOptions.map((emotion) => ({
+  const dynamicEmotions = records
+    .map((record) => record.emotion)
+    .filter(Boolean);
+
+  const mergedEmotions = [...new Set([...emotionOptions, ...dynamicEmotions])];
+
+  return mergedEmotions.map((emotion) => ({
     label: emotion,
     count: records.filter((record) => record.emotion === emotion).length
   }));

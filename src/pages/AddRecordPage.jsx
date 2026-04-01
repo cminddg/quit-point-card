@@ -1,22 +1,36 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { parseTags } from "../utils/recordHelpers";
 
 function getTodayValue() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const presetEmojis = ["😤", "😭", "🤬", "😩", "🥲", "🤡", "😶‍🌫️", "🫠"];
+
+const presetTags = [
+  "老闆畫大餅",
+  "同事大雷包",
+  "無效冗長會議",
+  "下班奪命連環 Call",
+  "薪水太委屈",
+  "需求朝令夕改",
+  "替人背黑鍋",
+  "燃燒生命大加班",
+  "心好累辦公室政治"
+];
+
 const initialForm = {
   title: "",
   date: getTodayValue(),
   emotion: "",
-  tags: "",
+  tags: [],
   description: ""
 };
 
-export default function AddRecordPage({ addRecord, emotionOptions }) {
+export default function AddRecordPage({ addRecord }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialForm);
+  const [customEmoji, setCustomEmoji] = useState("");
   const [message, setMessage] = useState("");
 
   function handleChange(event) {
@@ -27,8 +41,38 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
     }));
   }
 
+  function handleSelectEmoji(emoji) {
+    setCustomEmoji("");
+    setFormData((currentForm) => ({
+      ...currentForm,
+      emotion: emoji
+    }));
+  }
+
+  function handleCustomEmojiChange(event) {
+    const value = event.target.value;
+    setCustomEmoji(value);
+    setFormData((currentForm) => ({
+      ...currentForm,
+      emotion: value.trim()
+    }));
+  }
+
+  function toggleTag(tag) {
+    setFormData((currentForm) => {
+      const hasTag = currentForm.tags.includes(tag);
+      return {
+        ...currentForm,
+        tags: hasTag
+          ? currentForm.tags.filter((item) => item !== tag)
+          : [...currentForm.tags, tag]
+      };
+    });
+  }
+
   function handleReset() {
     setFormData(initialForm);
+    setCustomEmoji("");
     setMessage("已清空輸入內容。");
   }
 
@@ -44,11 +88,12 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
       title: formData.title.trim(),
       date: formData.date,
       emotion: formData.emotion,
-      tags: parseTags(formData.tags),
+      tags: formData.tags,
       description: formData.description.trim()
     });
 
     setFormData(initialForm);
+    setCustomEmoji("");
     setMessage("新增成功，正在帶你前往紀錄列表。");
 
     window.setTimeout(() => {
@@ -59,19 +104,9 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
   return (
     <div className="page-stack">
       <section className="page-card">
-        <div className="section-heading">
-          <div>
-            <p className="page-kicker">新增紀錄頁</p>
-            <h2>新增一筆離職紀錄</h2>
-          </div>
-          <p className="section-copy">
-            請輸入標題、情緒與內容；儲存後會立即出現在列表與統計頁。
-          </p>
-        </div>
-
         <form className="record-form" onSubmit={handleSubmit}>
           <label className="field-group">
-            <span>今天這筆紀錄的標題</span>
+            <span>破事標題</span>
             <input
               type="text"
               name="title"
@@ -86,32 +121,51 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
               <span>日期</span>
               <input type="date" name="date" value={formData.date} onChange={handleChange} />
             </label>
+          </div>
 
-            <label className="field-group">
-              <span>主要情緒</span>
-              <select name="emotion" value={formData.emotion} onChange={handleChange}>
-                <option value="" disabled>
-                  請先選一個情緒
-                </option>
-                {emotionOptions.map((emotion) => (
-                  <option key={emotion} value={emotion}>
-                    {emotion}
-                  </option>
-                ))}
-              </select>
+          <div className="field-group">
+            <span>主要情緒（單選）</span>
+            <div className="emoji-option-row">
+              {presetEmojis.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className={
+                    formData.emotion === emoji ? "emoji-option emoji-option-active" : "emoji-option"
+                  }
+                  onClick={() => handleSelectEmoji(emoji)}
+                  aria-label={`選擇情緒 ${emoji}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+            <label className="custom-emoji-wrap">
+              <span className="custom-emoji-label">其他 emoji（可自行輸入）</span>
+              <input
+                type="text"
+                value={customEmoji}
+                onChange={handleCustomEmojiChange}
+                placeholder="例如：😵‍💫"
+              />
             </label>
           </div>
 
-          <label className="field-group">
-            <span>標籤</span>
-            <input
-              type="text"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="例如：主管、薪水、工時、同事、制度"
-            />
-          </label>
+          <div className="field-group">
+            <span>標籤（可多選）</span>
+            <div className="tag-option-grid">
+              {presetTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={formData.tags.includes(tag) ? "chip-button chip-button-active" : "chip-button"}
+                  onClick={() => toggleTag(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <label className="field-group">
             <span>想多說一點的內容</span>
@@ -120,7 +174,7 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
               value={formData.description}
               onChange={handleChange}
               rows="6"
-              placeholder="把今天發生的事寫下來，之後才看得出哪些原因最常讓你想離職。"
+              placeholder="今天又發生什麼鳥事了？吐吐苦水吧......"
             />
           </label>
 
@@ -128,10 +182,10 @@ export default function AddRecordPage({ addRecord, emotionOptions }) {
 
           <div className="form-actions">
             <button type="submit" className="primary-button">
-              儲存這筆紀錄
+              蓋章確認
             </button>
             <button type="button" className="secondary-button" onClick={handleReset}>
-              清空內容
+              算了不說了/清空
             </button>
           </div>
         </form>
