@@ -92,6 +92,66 @@ textarea {
   margin-bottom: 24px;
 }
 
+.marquee-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(107, 114, 128, 0.24);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 8px 20px rgba(31, 41, 55, 0.08);
+}
+
+.marquee-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(254, 215, 170, 0.8);
+  font-size: 1.1rem;
+}
+
+.marquee-viewport {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.marquee-text {
+  margin: 0 !important;
+  max-width: none !important;
+  display: inline-block;
+  white-space: nowrap;
+  color: #1f2937 !important;
+  font-weight: 700;
+  animation: marquee-slide 4s linear;
+}
+
+@keyframes marquee-slide {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
 .nav-link {
   padding: 10px 16px;
   border-radius: 999px;

@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import AnnouncementMarquee from "./AnnouncementMarquee";
 
 const links = [
   { to: "/", label: "首頁" },
@@ -33,6 +34,8 @@ export default function AppShell() {
           </NavLink>
         ))}
       </nav>
+
+      <AnnouncementMarquee />
 
       <main className="page-frame">
         <Outlet />
