@@ -47,7 +47,7 @@ export default function HomePage({ records }) {
       <section className="page-card hero-card">
         <div className="hero-copy">
           <p className="page-kicker">首頁</p>
-          <h2>先把「我到底多常想離職」變成看得見的畫面</h2>
+          <h2>離職心情總覽</h2>
           <p className="hero-text">
             這一頁是專案入口。你可以從這裡快速前往新增紀錄、看清單、看統計，快速掌握最近的離職念頭。
           </p>
@@ -62,7 +62,7 @@ export default function HomePage({ records }) {
         </div>
 
         <div className="hero-panel">
-          <p className="panel-label">使用重點</p>
+          <p className="panel-label">功能特色</p>
           <ul className="bullet-list">
             <li>新增後列表與統計會同步更新</li>
             <li>可用情緒與標籤做快速篩選</li>
@@ -85,9 +85,9 @@ export default function HomePage({ records }) {
         <div className="section-heading">
           <div>
             <p className="page-kicker">最近紀錄</p>
-            <h2>首頁現在也會顯示最新一筆內容</h2>
+            <h2>最新一筆紀錄</h2>
           </div>
-          <p className="section-copy">這樣你一打開就能知道最近一次想離職是因為什麼。</p>
+          <p className="section-copy">打開首頁就能快速回顧最近一次紀錄內容。</p>
         </div>
         {latestRecord ? (
           <article className="latest-record-card">
