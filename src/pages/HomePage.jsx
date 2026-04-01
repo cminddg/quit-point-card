@@ -46,7 +46,6 @@ export default function HomePage({ records }) {
     <div className="page-stack">
       <section className="page-card hero-card">
         <div className="hero-copy">
-          <p className="page-kicker">首頁</p>
           <h2>離職心情總覽</h2>
           <p className="hero-text">
             這一頁是專案入口。你可以從這裡快速前往新增紀錄、看清單、看統計，快速掌握最近的離職念頭。
@@ -59,15 +58,6 @@ export default function HomePage({ records }) {
               看紀錄列表
             </Link>
           </div>
-        </div>
-
-        <div className="hero-panel">
-          <p className="panel-label">功能特色</p>
-          <ul className="bullet-list">
-            <li>新增後列表與統計會同步更新</li>
-            <li>可用情緒與標籤做快速篩選</li>
-            <li>重整頁面後紀錄仍會保留</li>
-          </ul>
         </div>
       </section>
 
