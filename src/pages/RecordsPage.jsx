@@ -13,26 +13,17 @@ function createEditForm(record) {
 }
 
 export default function RecordsPage({ records, emotionOptions, updateRecord, deleteRecord }) {
-  const [selectedEmotion, setSelectedEmotion] = useState("全部");
   const [selectedTag, setSelectedTag] = useState("全部");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [viewMode, setViewMode] = useState("list");
   const [editingRecordId, setEditingRecordId] = useState("");
   const [editingForm, setEditingForm] = useState(createEditForm({}));
   const [showExtraEmojiMenu, setShowExtraEmojiMenu] = useState(false);
   const [message, setMessage] = useState("");
 
-  const allEmotions = [
-    ...new Set([
-      ...emotionOptions,
-      ...records.map((record) => record.emotion).filter(Boolean)
-    ])
-  ];
-
   const normalizedKeyword = searchKeyword.trim().toLowerCase();
 
   const filteredRecords = records.filter((record) => {
-    const matchesEmotion =
-      selectedEmotion === "全部" || record.emotion === selectedEmotion;
     const matchesTag = selectedTag === "全部" || record.tags.includes(selectedTag);
     const searchSource = [
       record.title,
@@ -45,7 +36,7 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
       .toLowerCase();
     const matchesSearch = normalizedKeyword === "" || searchSource.includes(normalizedKeyword);
 
-    return matchesEmotion && matchesTag && matchesSearch;
+    return matchesTag && matchesSearch;
   });
 
   function startEdit(record) {
@@ -124,33 +115,36 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
     <div className="page-stack">
       <section className="page-card">
         <div className="filter-shell">
-          <label className="field-group record-search-group">
-            <span>搜尋</span>
-            <input
-              type="text"
-              value={searchKeyword}
-              onChange={(event) => setSearchKeyword(event.target.value)}
-              placeholder="找尋過往痛苦的記憶？"
-            />
-          </label>
+          <div className="record-search-row">
+            <label className="field-group record-search-group">
+              <span>搜尋</span>
+              <input
+                type="text"
+                value={searchKeyword}
+                onChange={(event) => setSearchKeyword(event.target.value)}
+                placeholder="找尋過往痛苦的記憶？"
+              />
+            </label>
 
-          <div className="filter-group">
-            <span className="filter-label">情緒</span>
-            <div className="chip-row">
-              {["全部", ...allEmotions].map((emotion) => (
-                <button
-                  key={emotion}
-                  type="button"
-                  className={
-                    selectedEmotion === emotion
-                      ? "chip-button chip-button-active"
-                      : "chip-button"
-                  }
-                  onClick={() => setSelectedEmotion(emotion)}
-                >
-                  {emotion}
-                </button>
-              ))}
+            <div className="view-switch" role="group" aria-label="切換紀錄顯示方式">
+              <button
+                type="button"
+                className={viewMode === "list" ? "view-switch-button view-switch-button-active" : "view-switch-button"}
+                onClick={() => setViewMode("list")}
+                aria-label="切換成橫列形式"
+                title="橫列形式"
+              >
+                ☰
+              </button>
+              <button
+                type="button"
+                className={viewMode === "card" ? "view-switch-button view-switch-button-active" : "view-switch-button"}
+                onClick={() => setViewMode("card")}
+                aria-label="切換成卡片形式"
+                title="卡片形式"
+              >
+                ▦
+              </button>
             </div>
           </div>
 
@@ -192,14 +186,19 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
       <section className="record-list">
         <div className="list-summary">
           <strong>目前顯示 {filteredRecords.length} 筆</strong>
-          <span>
-            情緒：{selectedEmotion} / 標籤：{selectedTag}
-          </span>
         </div>
 
         {filteredRecords.length > 0 ? (
-          filteredRecords.map((record) => (
-            <article key={record.id} className="page-card record-card">
+          <div className={viewMode === "card" ? "record-card-grid" : "record-card-list"}>
+            {filteredRecords.map((record) => (
+              <article
+                key={record.id}
+                className={
+                  editingRecordId === record.id
+                    ? "page-card record-card record-card-editing"
+                    : "page-card record-card"
+                }
+              >
               <div className="record-card-top">
                 <div>
                   <p className="record-date">
@@ -350,17 +349,18 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
                         </span>
                       ))
                     ) : (
-                      <span className="tag-pill">#未分類</span>
-                    )}
+                    <span className="tag-pill">#未分類</span>
+                  )}
                   </div>
                 </>
               )}
-            </article>
-          ))
+              </article>
+            ))}
+          </div>
         ) : (
           <div className="page-card empty-state">
             <h3>目前沒有符合條件的紀錄</h3>
-            <p>你可以換一個情緒或標籤，或者先去新增一筆新的離職紀錄。</p>
+            <p>你可以換一個標籤，或者先去新增一筆新的離職紀錄。</p>
           </div>
         )}
       </section>

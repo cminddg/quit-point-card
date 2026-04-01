@@ -38,10 +38,6 @@ export default function AppShell() {
       <main className="page-frame">
         <Outlet />
       </main>
-
-      <footer className="footer-note">
-        目前功能：新增紀錄、列表篩選、統計圖表。
-      </footer>
     </div>
   );
 }
