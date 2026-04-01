@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatDate } from "../utils/recordHelpers";
 import { tagOptions, extraEmojiOptions } from "../data/initialRecords";
 
@@ -20,6 +20,21 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
   const [editingForm, setEditingForm] = useState(createEditForm({}));
   const [showExtraEmojiMenu, setShowExtraEmojiMenu] = useState(false);
   const [message, setMessage] = useState("");
+  const [deleteToast, setDeleteToast] = useState(null);
+
+  useEffect(() => {
+    if (!deleteToast) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setDeleteToast(null);
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [deleteToast]);
 
   const normalizedKeyword = searchKeyword.trim().toLowerCase();
 
@@ -107,7 +122,10 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
     deleteRecord(recordId);
     setEditingRecordId("");
     setShowExtraEmojiMenu(false);
-    setMessage("這筆紀錄已刪除。");
+    setDeleteToast({
+      id: Date.now(),
+      text: "這筆紀錄已刪除。"
+    });
   }
 
   return (
@@ -374,6 +392,12 @@ export default function RecordsPage({ records, emotionOptions, updateRecord, del
           </div>
         )}
       </section>
+
+      {deleteToast ? (
+        <div key={deleteToast.id} className="delete-toast" role="status" aria-live="polite">
+          {deleteToast.text}
+        </div>
+      ) : null}
     </div>
   );
 }
