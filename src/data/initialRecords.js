@@ -1,6 +1,7 @@
 export const STORAGE_KEY = "quit-point-card-records";
 
 export const emotionOptions = ["😤", "😭", "🤬", "😩", "🥲", "🤡", "😶‍🌫️", "🫠"];
+export const extraEmojiOptions = ["😵‍💫", "🙄", "🥴", "🤯", "😮‍💨", "🤢", "🤮", "😬", "👹", "👺"];
 
 export const tagOptions = [
   "老闆畫大餅",

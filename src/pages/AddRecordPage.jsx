@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { tagOptions } from "../data/initialRecords";
+import { tagOptions, extraEmojiOptions } from "../data/initialRecords";
 
 function getTodayValue() {
   return new Date().toISOString().slice(0, 10);
 }
-
-const extraEmojiOptions = ["😵‍💫", "🙄", "🥴", "🤯", "😮‍💨", "🤢", "🤮", "😬", "👹", "👺"];
 
 function createInitialForm() {
   return {

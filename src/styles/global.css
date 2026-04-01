@@ -413,6 +413,7 @@ textarea {
 
 .primary-button,
 .secondary-button,
+.danger-button,
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -426,7 +427,8 @@ textarea {
 }
 
 .primary-button,
-.secondary-button {
+.secondary-button,
+.danger-button {
   min-height: 46px;
   padding: 0 18px;
   border: none;
@@ -445,6 +447,12 @@ textarea {
   border: 1px solid rgba(180, 83, 9, 0.18);
 }
 
+.danger-button {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid rgba(190, 24, 93, 0.24);
+}
+
 .text-link {
   width: fit-content;
   padding: 10px 0 0;
@@ -453,6 +461,7 @@ textarea {
 
 .primary-button:hover,
 .secondary-button:hover,
+.danger-button:hover,
 .text-link:hover {
   transform: translateY(-1px);
 }
@@ -587,6 +596,10 @@ textarea {
   gap: 18px;
 }
 
+.record-search-group input {
+  background: rgba(255, 255, 255, 0.92);
+}
+
 .filter-group {
   display: grid;
   gap: 10px;
@@ -659,6 +672,24 @@ textarea {
   align-items: start;
   justify-content: space-between;
   gap: 16px;
+}
+
+.record-icon-button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  background: rgba(255, 250, 244, 0.96);
+  cursor: pointer;
+  font-size: 1.15rem;
+}
+
+.record-edit-shell {
+  margin-top: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px dashed rgba(180, 83, 9, 0.22);
+  background: rgba(255, 252, 247, 0.9);
 }
 
 .record-date {
