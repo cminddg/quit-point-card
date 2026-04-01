@@ -14,31 +14,27 @@ const chartColors = [
   "#b886c9"
 ];
 
-function buildConicGradient(items) {
+function buildPieSlices(items) {
   const total = items.reduce((sum, item) => sum + item.count, 0);
-  if (total <= 0) {
-    return "conic-gradient(#f3f4f6 0deg 360deg)";
-  }
+  let cursor = 0;
 
-  let current = 0;
-  const parts = items.map((item, index) => {
-    const percent = (item.count / total) * 100;
-    const start = current;
-    const end = Math.min(100, current + percent);
-    current = end;
-    return `${chartColors[index % chartColors.length]} ${start}% ${end}%`;
+  return items.map((item, index) => {
+    const percent = total > 0 ? (item.count / total) * 100 : 0;
+    const slice = {
+      ...item,
+      color: chartColors[index % chartColors.length],
+      percent,
+      start: cursor
+    };
+    cursor += percent;
+    return slice;
   });
-
-  if (current < 100) {
-    parts.push(`#f3f4f6 ${current}% 100%`);
-  }
-
-  return `conic-gradient(${parts.join(", ")})`;
 }
 
 export default function StatsPage({ records }) {
   const [cloudRecords, setCloudRecords] = useState(null);
   const [chartType, setChartType] = useState("pie");
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   useEffect(() => {
     let isActive = true;
@@ -78,9 +74,12 @@ export default function StatsPage({ records }) {
     [cloudRecords, records]
   );
   const tagCounts = getTagStats(sourceRecords);
+  const chartItems = useMemo(() => buildPieSlices(tagCounts), [tagCounts]);
   const totalTagCount = tagCounts.reduce((sum, item) => sum + item.count, 0);
-  const donutBackground = buildConicGradient(tagCounts);
   const maxCount = Math.max(...tagCounts.map((item) => item.count), 1);
+  const hoverHint = hoveredItem
+    ? `${hoveredItem.label}：${hoveredItem.count} 票`
+    : "滑鼠移到圖表或圖例即可查看票數";
 
   return (
     <div className="page-stack">
@@ -118,42 +117,83 @@ export default function StatsPage({ records }) {
           <div className="stats-chart-body">
             {chartType === "pie" ? (
               <div className="donut-layout">
-                <div className="donut-wrap">
-                  <div className="donut-chart" style={{ backgroundImage: donutBackground }} />
+                <div className="donut-wrap" onMouseLeave={() => setHoveredItem(null)}>
+                  <svg
+                    className="donut-svg"
+                    viewBox="0 0 120 120"
+                    role="img"
+                    aria-label="離職標籤圓餅統計圖"
+                  >
+                    <g transform="rotate(-90 60 60)">
+                      {chartItems.map((item) => (
+                        <circle
+                          key={item.label}
+                          cx="60"
+                          cy="60"
+                          r="36"
+                          fill="none"
+                          stroke={item.color}
+                          strokeWidth="20"
+                          pathLength="100"
+                          strokeDasharray={`${item.percent} ${100 - item.percent}`}
+                          strokeDashoffset={-item.start}
+                          onMouseEnter={() => setHoveredItem({ label: item.label, count: item.count })}
+                        />
+                      ))}
+                    </g>
+                  </svg>
+
+                  <div className="donut-center-label">
+                    <strong>{hoveredItem ? hoveredItem.label : "總票數"}</strong>
+                    <span>{hoveredItem ? `${hoveredItem.count} 票` : `${totalTagCount} 票`}</span>
+                  </div>
                 </div>
+
                 <div className="donut-legend">
-                  {tagCounts.map((item, index) => (
-                    <div key={item.label} className="donut-legend-item">
+                  {chartItems.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      className="donut-legend-item"
+                      onMouseEnter={() => setHoveredItem({ label: item.label, count: item.count })}
+                      onFocus={() => setHoveredItem({ label: item.label, count: item.count })}
+                    >
                       <span
                         className="donut-legend-dot"
-                        style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                        style={{ backgroundColor: item.color }}
                       />
                       <span>{item.label}</span>
-                      <strong>{item.count}</strong>
-                    </div>
+                      <strong>{item.count}票</strong>
+                    </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="stats-tag-bars">
-                {tagCounts.map((item, index) => (
-                  <div key={item.label} className="stats-tag-row">
+              <div className="stats-tag-bars" onMouseLeave={() => setHoveredItem(null)}>
+                {chartItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="stats-tag-row"
+                    onMouseEnter={() => setHoveredItem({ label: item.label, count: item.count })}
+                    title={`${item.label}：${item.count}票`}
+                  >
                     <span>{item.label}</span>
                     <div className="stats-tag-track">
                       <div
                         className="stats-tag-fill"
                         style={{
                           width: `${(item.count / maxCount) * 100}%`,
-                          backgroundColor: chartColors[index % chartColors.length]
+                          backgroundColor: item.color
                         }}
                       />
                     </div>
-                    <strong>{item.count}</strong>
+                    <strong>{item.count}票</strong>
                   </div>
                 ))}
               </div>
             )}
 
+            <p className="stats-hover-note">{hoverHint}</p>
             <p className="stats-total-note">累積標籤次數：{totalTagCount} 次</p>
           </div>
         )}
