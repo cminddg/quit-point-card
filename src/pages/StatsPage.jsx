@@ -183,25 +183,14 @@ export default function StatsPage({ records }) {
                         style={{ backgroundColor: item.color }}
                       />
                       <span>{item.label}</span>
-                      <strong>{item.count}票 / {getPercent(item.count)}%</strong>
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="stats-tag-bars" onMouseLeave={() => setHoveredItem(null)}>
+              <div className="stats-tag-bars">
                 {chartItems.map((item) => (
-                  <div
-                    key={item.label}
-                    className="stats-tag-row"
-                    onMouseEnter={() =>
-                      setHoveredItem({
-                        label: item.label,
-                        count: item.count,
-                        percent: getPercent(item.count)
-                      })}
-                    title={`${item.label}：${item.count}票 / ${getPercent(item.count)}%`}
-                  >
+                  <div key={item.label} className="stats-tag-row">
                     <span>{item.label}</span>
                     <div className="stats-tag-track">
                       <div
@@ -219,7 +208,7 @@ export default function StatsPage({ records }) {
             )}
 
             <div className="stats-info-block">
-              <p className="stats-hover-note">{hoverHint}</p>
+              {chartType === "pie" ? <p className="stats-hover-note">{hoverHint}</p> : null}
               <p className="stats-total-note">累積標籤次數：{totalTagCount} 次</p>
             </div>
           </div>

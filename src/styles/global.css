@@ -1064,15 +1064,19 @@ textarea {
 }
 
 .donut-legend {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, max-content));
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 10px 12px;
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 .donut-legend-item {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 0 1 calc((100% - 24px) / 3);
   gap: 8px;
   padding: 6px 10px;
   border-radius: 999px;
@@ -1125,15 +1129,10 @@ textarea {
 
 .stats-tag-row {
   display: grid;
-  grid-template-columns: minmax(120px, 220px) minmax(0, 1fr) 42px;
+  grid-template-columns: minmax(120px, 220px) minmax(0, 0.88fr) minmax(108px, 120px);
   align-items: center;
   gap: 12px;
   padding: 6px 0;
-}
-
-.stats-tag-row:hover {
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
 }
 
 .stats-tag-track {
@@ -1172,6 +1171,11 @@ textarea {
 .stats-info-block p {
   text-align: center;
   width: 100%;
+}
+
+.stats-tag-row strong {
+  white-space: nowrap;
+  text-align: left;
 }
 
 @media (max-width: 720px) {
@@ -1275,6 +1279,10 @@ textarea {
   }
 
   .donut-legend {
-    grid-template-columns: repeat(1, minmax(0, max-content));
+    max-width: 100%;
+  }
+
+  .donut-legend-item {
+    flex-basis: 100%;
   }
 }
