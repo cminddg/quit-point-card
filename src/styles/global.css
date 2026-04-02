@@ -292,7 +292,10 @@ textarea {
 
 .stamp-progress-subtitle,
 .stamp-board-note {
+  display: block;
   width: 100%;
+  max-width: none !important;
+  margin: 10px 0 0 !important;
   text-align: center;
 }
 
