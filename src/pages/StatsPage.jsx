@@ -77,8 +77,9 @@ export default function StatsPage({ records }) {
   const chartItems = useMemo(() => buildPieSlices(tagCounts), [tagCounts]);
   const totalTagCount = tagCounts.reduce((sum, item) => sum + item.count, 0);
   const maxCount = Math.max(...tagCounts.map((item) => item.count), 1);
+  const getPercent = (count) => (totalTagCount > 0 ? Math.round((count / totalTagCount) * 100) : 0);
   const hoverHint = hoveredItem
-    ? `${hoveredItem.label}：${hoveredItem.count} 票`
+    ? `${hoveredItem.label} ${hoveredItem.count}票 / ${hoveredItem.percent}%`
     : "滑鼠移到圖表或圖例即可查看票數";
 
   return (
@@ -137,7 +138,12 @@ export default function StatsPage({ records }) {
                           pathLength="100"
                           strokeDasharray={`${item.percent} ${100 - item.percent}`}
                           strokeDashoffset={-item.start}
-                          onMouseEnter={() => setHoveredItem({ label: item.label, count: item.count })}
+                          onMouseEnter={() =>
+                            setHoveredItem({
+                              label: item.label,
+                              count: item.count,
+                              percent: getPercent(item.count)
+                            })}
                         />
                       ))}
                     </g>
@@ -145,7 +151,11 @@ export default function StatsPage({ records }) {
 
                   <div className="donut-center-label">
                     <strong>{hoveredItem ? hoveredItem.label : "總票數"}</strong>
-                    <span>{hoveredItem ? `${hoveredItem.count} 票` : `${totalTagCount} 票`}</span>
+                    <span>
+                      {hoveredItem
+                        ? `${hoveredItem.count}票 / ${hoveredItem.percent}%`
+                        : `${totalTagCount} 票`}
+                    </span>
                   </div>
                 </div>
 
@@ -155,15 +165,25 @@ export default function StatsPage({ records }) {
                       key={item.label}
                       type="button"
                       className="donut-legend-item"
-                      onMouseEnter={() => setHoveredItem({ label: item.label, count: item.count })}
-                      onFocus={() => setHoveredItem({ label: item.label, count: item.count })}
+                      onMouseEnter={() =>
+                        setHoveredItem({
+                          label: item.label,
+                          count: item.count,
+                          percent: getPercent(item.count)
+                        })}
+                      onFocus={() =>
+                        setHoveredItem({
+                          label: item.label,
+                          count: item.count,
+                          percent: getPercent(item.count)
+                        })}
                     >
                       <span
                         className="donut-legend-dot"
                         style={{ backgroundColor: item.color }}
                       />
                       <span>{item.label}</span>
-                      <strong>{item.count}票</strong>
+                      <strong>{item.count}票 / {getPercent(item.count)}%</strong>
                     </button>
                   ))}
                 </div>
@@ -174,8 +194,13 @@ export default function StatsPage({ records }) {
                   <div
                     key={item.label}
                     className="stats-tag-row"
-                    onMouseEnter={() => setHoveredItem({ label: item.label, count: item.count })}
-                    title={`${item.label}：${item.count}票`}
+                    onMouseEnter={() =>
+                      setHoveredItem({
+                        label: item.label,
+                        count: item.count,
+                        percent: getPercent(item.count)
+                      })}
+                    title={`${item.label}：${item.count}票 / ${getPercent(item.count)}%`}
                   >
                     <span>{item.label}</span>
                     <div className="stats-tag-track">
@@ -187,14 +212,16 @@ export default function StatsPage({ records }) {
                         }}
                       />
                     </div>
-                    <strong>{item.count}票</strong>
+                    <strong>{item.count}票 / {getPercent(item.count)}%</strong>
                   </div>
                 ))}
               </div>
             )}
 
-            <p className="stats-hover-note">{hoverHint}</p>
-            <p className="stats-total-note">累積標籤次數：{totalTagCount} 次</p>
+            <div className="stats-info-block">
+              <p className="stats-hover-note">{hoverHint}</p>
+              <p className="stats-total-note">累積標籤次數：{totalTagCount} 次</p>
+            </div>
           </div>
         )}
       </section>
