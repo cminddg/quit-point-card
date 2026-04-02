@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/recordHelpers";
 import { emotionOptions } from "../data/initialRecords";
@@ -70,10 +70,22 @@ export default function HomePage({ records, addRecord }) {
   const latestRecord = records[0];
   const [showInlineAddForm, setShowInlineAddForm] = useState(false);
   const [punchProgress, setPunchProgress] = useState(loadPunchProgress);
+  const inlineAddSectionRef = useRef(null);
 
   useEffect(() => {
     window.localStorage.setItem(PUNCH_PROGRESS_KEY, JSON.stringify(punchProgress));
   }, [punchProgress]);
+
+  useEffect(() => {
+    if (!showInlineAddForm || !inlineAddSectionRef.current) {
+      return;
+    }
+
+    inlineAddSectionRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, [showInlineAddForm]);
 
   const consumedPoints = useMemo(
     () =>
@@ -186,6 +198,7 @@ export default function HomePage({ records, addRecord }) {
                 ? "滿點了，該做決定了。"
                 : "再撐一下下，你正在累積自己的離職勇氣。"}
             </p>
+            <p className="stamp-board-note">目前是第 {currentCardNumber} 張集點卡。</p>
 
             <div className="stamp-grid" aria-label="離職集點格">
               {stampSlots.map((slot) => (
@@ -253,8 +266,6 @@ export default function HomePage({ records, addRecord }) {
           </Link>
         </div>
 
-        <p className="punch-card-note">目前是第 {currentCardNumber} 張集點卡。</p>
-
         {punchProgress.completedCards.length > 0 ? (
           <div className="stamp-history">
             {punchProgress.completedCards.map((card, index) => (
@@ -267,7 +278,7 @@ export default function HomePage({ records, addRecord }) {
       </section>
 
       {showInlineAddForm ? (
-        <section className="page-card inline-add-card">
+        <section ref={inlineAddSectionRef} className="page-card inline-add-card">
           <h2>新增紀錄</h2>
           <AddRecordPage
             addRecord={addRecord}
