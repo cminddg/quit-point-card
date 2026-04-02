@@ -211,7 +211,6 @@ export default function HomePage({ records, addRecord }) {
                 ? "滿點了，該做決定了。"
                 : "再撐一下下，你正在累積自己的離職勇氣。"}
             </p>
-            <p className="stamp-board-note">目前是第 {currentCardNumber} 張集點卡。</p>
 
             <div className="stamp-grid" aria-label="離職集點格">
               {stampSlots.map((slot) => (
@@ -278,6 +277,7 @@ export default function HomePage({ records, addRecord }) {
             看紀錄列表
           </Link>
         </div>
+        <p className="stamp-board-note">目前是第 {currentCardNumber} 張集點卡。</p>
 
         {punchProgress.completedCards.length > 0 ? (
           <div className="stamp-history">
