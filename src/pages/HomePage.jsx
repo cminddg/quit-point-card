@@ -81,10 +81,16 @@ export default function HomePage({ records, addRecord }) {
       return;
     }
 
-    inlineAddSectionRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+    const timer = window.setTimeout(() => {
+      inlineAddSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 40);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, [showInlineAddForm]);
 
   const consumedPoints = useMemo(
@@ -175,6 +181,11 @@ export default function HomePage({ records, addRecord }) {
     });
   }
 
+  function handleToggleInlineAdd() {
+    const willOpen = !showInlineAddForm;
+    setShowInlineAddForm(willOpen);
+  }
+
   return (
     <div className="page-stack">
       <AnnouncementMarquee />
@@ -191,9 +202,11 @@ export default function HomePage({ records, addRecord }) {
         <div className="stamp-board-wrap">
           <div className="stamp-board">
             <h3>
-              已集滿 <span>{filledCount}</span> / {currentTarget} 點
+              <span className="stamp-progress-title">
+                已集滿 <span className="stamp-progress-count">{filledCount}</span> / {currentTarget} 點
+              </span>
             </h3>
-            <p>
+            <p className="stamp-progress-subtitle">
               {isCurrentCardFull
                 ? "滿點了，該做決定了。"
                 : "再撐一下下，你正在累積自己的離職勇氣。"}
@@ -257,7 +270,7 @@ export default function HomePage({ records, addRecord }) {
           <button
             type="button"
             className="add-trouble-button"
-            onClick={() => setShowInlineAddForm((isOpen) => !isOpen)}
+            onClick={handleToggleInlineAdd}
           >
             ＋ 新增一筆破事
           </button>

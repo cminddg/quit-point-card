@@ -275,12 +275,24 @@ textarea {
   font-size: 1.9rem;
 }
 
-.stamp-board h3 span {
+.stamp-progress-title {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.stamp-progress-count {
   color: #d97706;
 }
 
 .stamp-board p {
   margin: 8px auto 0 !important;
+  text-align: center;
+}
+
+.stamp-progress-subtitle,
+.stamp-board-note {
+  width: 100%;
   text-align: center;
 }
 
